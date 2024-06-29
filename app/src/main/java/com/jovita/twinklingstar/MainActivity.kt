@@ -29,7 +29,9 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.jovita.twinklingstar.ui.theme.TwinklingStarTheme
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
@@ -52,70 +54,35 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun TwinklingStarBase(modifier: Modifier = Modifier) {
     Box {
+// List to track if stars are shown for each star
+        val showStars8 = remember { List(5) { mutableStateOf(false) } }
 
-
-        var showStars by remember { mutableStateOf(false) } // Track if stars are shown
-        var showStars2 by remember { mutableStateOf(false) } // Track if stars are shown
-        var showStars3 by remember { mutableStateOf(false) } // Track if stars are shown
-        var showStars4 by remember { mutableStateOf(false) } // Track if stars are shown
-        var showStars5 by remember { mutableStateOf(false) } // Track if stars are shown
-
-        LaunchedEffect(Unit) {
-            repeat(40) {
-                delay(500)
-                showStars = true // Set showStars to true after each delay
-                delay(500) // Optional delay for star visibility (adjust as needed)
-                showStars = false // Hide star after additional delay
+        // Function to handle star visibility logic
+        fun CoroutineScope.handleStarVisibility(index: Int, delayTime: Long) {
+            launch {
+                repeat(40) {
+                    delay(delayTime)
+                    showStars8[index].value = true // Set showStars to true after each delay
+                    delay(delayTime) // Optional delay for star visibility (adjust as needed)
+                    showStars8[index].value = false // Hide star after additional delay
+                }
             }
         }
         LaunchedEffect(Unit) {
-            repeat(40) {
-                delay(700)
-                showStars2 = true // Set showStars to true after each delay
-                delay(700) // Optional delay for star visibility (adjust as needed)
-                showStars2 = false // Hide star after additional delay
-            }
+            handleStarVisibility(0, 500L)
+            handleStarVisibility(1, 700L)
+            handleStarVisibility(2, 1100L)
+            handleStarVisibility(3, 500L)
+            handleStarVisibility(4, 700L)
         }
-        LaunchedEffect(Unit) {
-            repeat(40) {
-                delay(1100)
-                showStars3 = true // Set showStars to true after each delay
-                delay(1100) // Optional delay for star visibility (adjust as needed)
-                showStars3 = false // Hide star after additional delay
+        showStars8.forEach { state ->
+            if (state.value) {
+                AddStar() // Call AddStar conditionally
             }
         }
 
-        LaunchedEffect(Unit) {
-            repeat(40) {
-                delay(500)
-                showStars4 = true // Set showStars to true after each delay
-                delay(500) // Optional delay for star visibility (adjust as needed)
-                showStars4 = false // Hide star after additional delay
-            }
-        }
-
-        LaunchedEffect(Unit) {
-            repeat(40) {
-                delay(700)
-                showStars5 = true // Set showStars to true after each delay
-                delay(700) // Optional delay for star visibility (adjust as needed)
-                showStars5 = false // Hide star after additional delay
-            }
-        }
-
-        if (showStars) {
-            AddStar() // Call AddStar conditionally
-        }
-        if (showStars2) {
-            AddStar() // Call AddStar conditionally
-        }
-        if (showStars3) {
-            AddStar() // Call AddStar conditionally
-        }
-        if (showStars4) {
-            AddStar() // Call AddStar conditionally
-        }
     }
+
 
 }
 
@@ -129,11 +96,11 @@ fun AddStar() {
     val screenHeightDp = configuration.screenHeightDp.dp
 
     val heightRange =
-        0..screenHeightDp.value.toInt() - 10 // Range from 0 (inclusive) to screen height (inclusive)
+        0..screenHeightDp.value.toInt()/2 // Range from 0 (inclusive) to screen height (inclusive)
     val randHeight = heightRange.random()
 
     val widthRange =
-        0..screenWidthDp.value.toInt() - 10 // Range from 0 (inclusive) to screen width (inclusive)
+        0..screenWidthDp.value.toInt()/2 // Range from 0 (inclusive) to screen width (inclusive)
     val randWidth = widthRange.random()
 
     LaunchedEffect(Unit) { // LaunchedEffect for side effects
